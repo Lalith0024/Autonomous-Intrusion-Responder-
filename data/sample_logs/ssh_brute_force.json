@@ -1,0 +1,29 @@
+[
+  {
+    "timestamp": "2026-03-18T22:00:00Z",
+    "source_ip": "45.33.32.156",
+    "destination_ip": "192.168.1.10",
+    "destination_port": 22,
+    "protocol": "TCP",
+    "event_type": "failed_login",
+    "raw_log": "Mar 18 22:00:01 server sshd[1234]: Failed password for root from 45.33.32.156 port 54832 ssh2"
+  },
+  {
+    "timestamp": "2026-03-18T22:05:00Z",
+    "source_ip": "192.168.1.55",
+    "destination_ip": "192.168.1.10",
+    "destination_port": 80,
+    "protocol": "TCP",
+    "event_type": "connection",
+    "raw_log": "192.168.1.55 - - [18/Mar/2026:22:05:00 +0000] \"GET /index.html HTTP/1.1\" 200 1024"
+  },
+  {
+    "timestamp": "2026-03-18T22:10:00Z",
+    "source_ip": "10.0.0.99",
+    "destination_ip": "192.168.1.10",
+    "destination_port": 0,
+    "protocol": "TCP",
+    "event_type": "port_scan",
+    "raw_log": "Connection attempts to multiple sequential ports (80, 81, 82, 83) from 10.0.0.99 within 2 seconds"
+  }
+]
