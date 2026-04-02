@@ -214,10 +214,11 @@ def inject_ui():
         ''', unsafe_allow_html=True)
 
         st.markdown('<div class="nav-header">Navigation</div>', unsafe_allow_html=True)
-        st.page_link("src/streamlit_app/dashboard.py", label="Overview")
-        st.page_link("src/streamlit_app/pages/1_Live_Analysis.py", label="Live Analysis")
-        st.page_link("src/streamlit_app/pages/2_Incident_Dashboard.py", label="Incident Dashboard")
-        st.page_link("src/streamlit_app/pages/3_Eval_Results.py", label="Eval Results")
+        # Streamlit Cloud executes the main module directly, meaning page links must be relative to the main script natively.
+        st.page_link("dashboard.py", label="Overview")
+        st.page_link("pages/1_Live_Analysis.py", label="Live Analysis")
+        st.page_link("pages/2_Incident_Dashboard.py", label="Incident Dashboard")
+        st.page_link("pages/3_Eval_Results.py", label="Eval Results")
 
         st.markdown('<div class="nav-header" style="margin-top: 3rem;">System Info</div>', unsafe_allow_html=True)
         st.markdown('<div style="font-size: 0.75rem; color: #64748b; line-height: 1.6;">Version: v1.1.0<br>Model: Groq LLaMA 3.3<br>Orchestrator: LangGraph</div>', unsafe_allow_html=True)
