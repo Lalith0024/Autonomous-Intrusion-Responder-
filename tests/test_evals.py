@@ -1,11 +1,14 @@
 """Behavioral eval suite — tests the LLM's judgment, not code logic.
 
 Run directly: python tests/test_evals.py
-Requires OPENAI_API_KEY in .env
+Results are saved to data/results/eval_results.json for the dashboard.
+Requires GROQ_API_KEY (or OPENAI_API_KEY) in .env
 """
 
+import json
 import sys
 import time
+from pathlib import Path
 
 sys.path.insert(0, ".")
 
@@ -15,6 +18,8 @@ load_dotenv()
 
 from src.agents.triage_agent import analyze_log_event
 from src.models.schemas import LogEvent
+
+OUTPUT_PATH = Path("data/results/eval_results.json")
 
 EVAL_CASES = [
     {
@@ -142,6 +147,7 @@ def run_evals() -> None:
     total = len(EVAL_CASES)
     confidences = []
     latencies = []
+    eval_results = []
 
     for i, case in enumerate(EVAL_CASES, 1):
         name = case["name"]
@@ -174,12 +180,37 @@ def run_evals() -> None:
             if not sev_match:
                 print(f"    severity: expected={case['expected_severity']}, got={actual_severity}")
 
+        eval_results.append({
+            "name": name,
+            "log_snippet": case["log_event"]["raw_log"][:80] + "...",
+            "expected_attack_type": case["expected_attack_type"],
+            "expected_severity": case["expected_severity"],
+            "actual_attack_type": actual_type,
+            "actual_severity": actual_severity,
+            "confidence": round(confidence, 3),
+            "latency_s": round(elapsed, 2),
+            "passed": passed,
+        })
+
     avg_conf = sum(confidences) / len(confidences) if confidences else 0
     avg_lat = sum(latencies) / len(latencies) if latencies else 0
 
     print(f"\n{'='*60}")
     print(f"  Eval Results: {correct}/{total} correct | Avg confidence: {avg_conf:.2f} | Avg latency: {avg_lat:.1f}s")
     print(f"{'='*60}\n")
+
+    # Save results so the dashboard can display them without re-running LLM calls
+    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    summary = {
+        "total": total,
+        "correct": correct,
+        "accuracy_pct": round((correct / total) * 100, 1),
+        "avg_confidence": round(avg_conf, 3),
+        "avg_latency_s": round(avg_lat, 2),
+        "cases": eval_results,
+    }
+    OUTPUT_PATH.write_text(json.dumps(summary, indent=2))
+    print(f"  Results saved → {OUTPUT_PATH}\n")
 
 
 if __name__ == "__main__":
