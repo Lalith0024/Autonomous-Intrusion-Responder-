@@ -32,4 +32,4 @@ EXPOSE 8501
 
 # Default command is just to keep container alive
 # In production, you would run backend and frontend in separate containers
-CMD ["sh", "-c", "python3 run.py & streamlit run dashboard.py --server.port 8501 --server.address 0.0.0.0"]
+CMD ["sh", "-c", "python3 run.py & streamlit run src/streamlit_app/dashboard.py --server.port 8501 --server.address 0.0.0.0"]

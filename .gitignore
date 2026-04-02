@@ -60,3 +60,7 @@ venv.bak/
 # macOS
 .DS_Store
 
+# Application Data generated at runtime
+data/results/*.json
+data/cicids/*.csv
+data/cicids/*.pcap
