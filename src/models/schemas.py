@@ -1,6 +1,8 @@
 """Pydantic data models for the application."""
 
 from enum import Enum
+from typing import Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -48,6 +50,14 @@ class LogEvent(BaseModel):
     metadata: dict = Field(default_factory=dict, description="Optional extra fields")
 
 
+class ResponsePlan(BaseModel):
+    """Model representing the response agent's containment playbook."""
+
+    response_steps: list[str] = Field(description="Step-by-step containment actions")
+    estimated_impact: str = Field(description="One sentence on blast radius")
+    escalate_to_tier2: bool = Field(description="Whether this needs a human SOC analyst")
+
+
 class IncidentReport(BaseModel):
     """Model representing the structured output incident report."""
 
@@ -61,3 +71,7 @@ class IncidentReport(BaseModel):
     reasoning: str = Field(description="LLM's explanation of its classification (1-2 sentences)")
     indicators: list[str] = Field(description="List of suspicious signals found in the log")
     processing_time_ms: int = Field(description="Time taken to process the event in milliseconds")
+    response_plan: Optional[ResponsePlan] = Field(default=None, description="Playbook from response agent, if triggered")
+    needs_human_review: bool = Field(default=False, description="Flagged when confidence is too low for automation")
+    human_review_message: Optional[str] = Field(default=None, description="Message for the analyst when flagged")
+    graph_path: list[str] = Field(default_factory=list, description="Nodes traversed during graph execution")
