@@ -196,7 +196,9 @@ def inject_ui():
 
         try:
             import httpx
-            r = httpx.get("http://127.0.0.1:8000/health", timeout=1.0)
+            import os
+            api_base = os.getenv("API_BASE", "http://127.0.0.1:8000")
+            r = httpx.get(f"{api_base}/health", timeout=1.0)
             api_ok = (r.status_code == 200)
         except Exception:
             api_ok = False

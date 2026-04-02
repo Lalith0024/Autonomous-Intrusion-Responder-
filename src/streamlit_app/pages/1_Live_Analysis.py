@@ -12,7 +12,8 @@ from src.streamlit_app.layout import inject_ui, get_severity_badge, get_severity
 st.set_page_config(page_title="AIR - Live Analysis", layout="wide", initial_sidebar_state="expanded")
 inject_ui()
 
-API_BASE = "http://127.0.0.1:8000"
+import os
+API_BASE = os.getenv("API_BASE", "http://127.0.0.1:8000")
 RESULTS_PATH = Path("data/results/batch_results.json")
 SAMPLE_LOG = "Mar 18 22:00:01 server sshd[1234]: Failed password for root from 45.33.32.156 port 54832 ssh2 — 47 failed attempts in 60 seconds"
 
