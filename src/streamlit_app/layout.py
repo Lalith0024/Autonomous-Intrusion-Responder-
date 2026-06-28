@@ -383,22 +383,7 @@ def inject_ui():
             st.markdown(comp_html, unsafe_allow_html=True)
 
         st.markdown('<div class="nav-header">Navigation</div>', unsafe_allow_html=True)
-        # Robust navigation paths relative to src/streamlit_app
-        st.page_link("dashboard.py", label="Overview")
-        st.page_link("pages/0_About.py", label="About AIR")
-        st.page_link("pages/1_Live_Analysis.py", label="Live Analysis")
-        st.page_link("pages/2_Incident_Dashboard.py", label="Incident History")
-        st.page_link("pages/3_Eval_Results.py", label="Performance")
 
-        st.markdown('<div class="nav-header" style="margin-top: 4rem;">System Data</div>', unsafe_allow_html=True)
-        st.markdown('''
-            <div style="font-size: 0.6rem; color: #475569; line-height: 2.2; font-family: 'JetBrains Mono', monospace; padding-left: 0.5rem;">
-                ENV: PRODUCTION<br>
-                CORE: LLAMA-3.3-70B<br>
-                STORAGE: LOCAL FAISS<br>
-                SERVICE: ANALYTICS ID-24
-            </div>
-        ''', unsafe_allow_html=True)
 
 
 def get_severity_badge(sev: str) -> str:

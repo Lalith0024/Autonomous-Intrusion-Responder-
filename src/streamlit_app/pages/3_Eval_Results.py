@@ -9,10 +9,7 @@ from pathlib import Path
 import streamlit as st
 
 from src.core.config import settings
-from src.streamlit_app.layout import inject_ui
 
-st.set_page_config(page_title="AIR — Benchmarking", layout="wide", initial_sidebar_state="expanded")
-inject_ui()
 
 BATCH_PATH = Path(settings.BATCH_RESULTS_PATH)
 EVAL_PATH  = Path(settings.EVAL_RESULTS_PATH)

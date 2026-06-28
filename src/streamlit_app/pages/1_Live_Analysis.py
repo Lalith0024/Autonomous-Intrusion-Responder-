@@ -13,10 +13,8 @@ import httpx
 import os
 
 from src.core.config import settings
-from src.streamlit_app.layout import inject_ui, get_severity_badge, get_severity_accent
+from src.streamlit_app.layout import get_severity_badge, get_severity_accent
 
-st.set_page_config(page_title="AIR — Live Analyst", layout="wide", initial_sidebar_state="expanded")
-inject_ui()
 
 API_BASE = os.getenv("API_BASE", "http://127.0.0.1:8000")
 RESULTS_PATH = Path(settings.BATCH_RESULTS_PATH)

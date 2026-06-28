@@ -1,0 +1,97 @@
+{
+  "total": 8,
+  "correct": 2,
+  "accuracy_pct": 25.0,
+  "avg_confidence": 0.881,
+  "avg_latency_s": 0.84,
+  "cases": [
+    {
+      "name": "SSH Brute Force",
+      "log_snippet": "Mar 18 22:00:01 server sshd[1234]: Failed password for root from 45.33.32.156 po...",
+      "expected_attack_type": "brute_force",
+      "expected_severity": "high",
+      "actual_attack_type": "brute_force",
+      "actual_severity": "high",
+      "confidence": 0.9,
+      "latency_s": 1.1,
+      "passed": true
+    },
+    {
+      "name": "SQL Injection",
+      "log_snippet": "203.0.113.42 - - [01/Apr/2026:10:05:00] \"GET /api/users?id=1' OR '1'='1' -- HTTP...",
+      "expected_attack_type": "sql_injection",
+      "expected_severity": "critical",
+      "actual_attack_type": "sql_injection",
+      "actual_severity": "high",
+      "confidence": 0.9,
+      "latency_s": 0.74,
+      "passed": false
+    },
+    {
+      "name": "Port Scan",
+      "log_snippet": "SYN packets to ports 21,22,23,25,80,443,3389,5432,8080,8443 from 10.0.0.99 withi...",
+      "expected_attack_type": "port_scan",
+      "expected_severity": "medium",
+      "actual_attack_type": "port_scan",
+      "actual_severity": "medium",
+      "confidence": 0.9,
+      "latency_s": 0.79,
+      "passed": true
+    },
+    {
+      "name": "DDoS Signature",
+      "log_snippet": "UDP flood detected: 850,000 packets/sec from 198.51.100.0/24 subnet targeting po...",
+      "expected_attack_type": "denial_of_service",
+      "expected_severity": "critical",
+      "actual_attack_type": "denial_of_service",
+      "actual_severity": "high",
+      "confidence": 0.95,
+      "latency_s": 0.89,
+      "passed": false
+    },
+    {
+      "name": "Malware Beacon",
+      "log_snippet": "Periodic HTTPS POST to 185.141.63.120:8443 every 300s \u2014 payload 2KB encoded base...",
+      "expected_attack_type": "unknown",
+      "expected_severity": "high",
+      "actual_attack_type": "denial_of_service",
+      "actual_severity": "high",
+      "confidence": 0.8,
+      "latency_s": 0.82,
+      "passed": false
+    },
+    {
+      "name": "Suspicious Login",
+      "log_snippet": "Successful RDP login for admin from 91.240.118.172 (GeoIP: Russia) at 03:14 UTC ...",
+      "expected_attack_type": "brute_force",
+      "expected_severity": "high",
+      "actual_attack_type": "unknown",
+      "actual_severity": "medium",
+      "confidence": 0.8,
+      "latency_s": 0.83,
+      "passed": false
+    },
+    {
+      "name": "Normal Traffic",
+      "log_snippet": "192.168.1.55 - - [01/Apr/2026:10:30:00 +0000] \"GET /index.html HTTP/1.1\" 200 102...",
+      "expected_attack_type": "normal_traffic",
+      "expected_severity": "low",
+      "actual_attack_type": "normal_traffic",
+      "actual_severity": "info",
+      "confidence": 0.9,
+      "latency_s": 0.81,
+      "passed": false
+    },
+    {
+      "name": "Ambiguous Activity",
+      "log_snippet": "Single connection to port 8080 from internal host 172.16.0.100 \u2014 1 GET request t...",
+      "expected_attack_type": "normal_traffic",
+      "expected_severity": "low",
+      "actual_attack_type": "normal_traffic",
+      "actual_severity": "info",
+      "confidence": 0.9,
+      "latency_s": 0.75,
+      "passed": false
+    }
+  ]
+}

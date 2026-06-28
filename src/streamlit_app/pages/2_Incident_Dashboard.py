@@ -11,10 +11,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from src.core.config import settings
-from src.streamlit_app.layout import inject_ui, get_severity_badge
-
-st.set_page_config(page_title="AIR — Threat Intel", layout="wide", initial_sidebar_state="expanded")
-inject_ui()
+from src.streamlit_app.layout import get_severity_badge
 
 RESULTS_PATH = Path(settings.BATCH_RESULTS_PATH)
 BLOCKED_PATH = Path(settings.BLOCKED_IPS_PATH)
