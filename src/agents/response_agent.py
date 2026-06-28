@@ -1,4 +1,11 @@
-"""Response agent for generating containment playbooks from triaged incidents."""
+"""Response Agent V2 — Generates containment playbooks and executes blocking actions.
+
+V2 Upgrades:
+    - After generating the playbook, calls block_ip() tool if recommended action is BLOCK_IP
+    - Returns block status and tool call records for tracing
+"""
+
+from __future__ import annotations
 
 import logging
 
@@ -25,7 +32,16 @@ class LLMResponseOutput(BaseModel):
 
 
 def generate_response_plan(incident: IncidentReport) -> dict:
-    """Generate a response playbook for a triaged incident using Groq or OpenAI."""
+    """Generate a response playbook for a triaged incident.
+
+    V2: Also executes the block_ip tool if the recommended action is BLOCK_IP.
+
+    Args:
+        incident: The triaged incident report.
+
+    Returns:
+        Dict with response plan data + optional block result and tool records.
+    """
     logger.info("Response agent generating playbook for %s attack", incident.attack_type.value)
 
     if settings.GROQ_API_KEY:
@@ -35,7 +51,6 @@ def generate_response_plan(incident: IncidentReport) -> dict:
             temperature=0,
             api_key=settings.GROQ_API_KEY,
         )
-        logger.info("Using Groq model: %s", settings.GROQ_MODEL)
     else:
         from langchain_openai import ChatOpenAI
         llm = ChatOpenAI(
@@ -43,7 +58,6 @@ def generate_response_plan(incident: IncidentReport) -> dict:
             temperature=0,
             api_key=settings.OPENAI_API_KEY,
         )
-        logger.info("Using OpenAI model: %s", settings.OPENAI_MODEL)
 
     structured_llm = llm.with_structured_output(LLMResponseOutput)
 
@@ -57,4 +71,30 @@ def generate_response_plan(incident: IncidentReport) -> dict:
     chain = prompt | structured_llm
     result = chain.invoke({"incident_json": incident.model_dump_json()})
 
-    return result.model_dump()
+    response_data = result.model_dump()
+
+    # V2: Execute block_ip tool if recommended action is BLOCK_IP
+    tool_records: list[dict] = []
+    block_result = None
+
+    if settings.TOOLS_ENABLED and incident.recommended_action.value == "block_ip":
+        try:
+            from src.tools.security_toolkit import block_ip
+
+            block_res, block_record = block_ip(
+                ip_address=incident.source_ip,
+                reason=f"Automated: {incident.attack_type.value} attack (confidence {incident.confidence_score:.0%})",
+                duration_hours=24,
+            )
+            block_result = block_res
+            tool_records.append(block_record.model_dump())
+
+            logger.info("IP %s blocked by response agent", incident.source_ip)
+
+        except Exception as e:
+            logger.error("Failed to execute block_ip: %s", e)
+
+    response_data["_block_result"] = block_result
+    response_data["_tool_records"] = tool_records
+
+    return response_data

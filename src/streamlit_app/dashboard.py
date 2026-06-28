@@ -1,72 +1,127 @@
+"""AIR V2 — Overview Dashboard.
+
+Shows system health, key metrics, architecture overview, and recent activity.
+Clean light-mode interface for a professional SOC experience.
+"""
+
 import streamlit as st
+import json
 import sys
 from pathlib import Path
 
-# Fix import path for UI module
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from src.core.config import settings
 from src.streamlit_app.layout import inject_ui
 
-st.set_page_config(
-    page_title="AIR",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
-
-# Apply global design system
+st.set_page_config(page_title="AIR — Cyber Command", layout="wide", initial_sidebar_state="expanded")
 inject_ui()
 
-st.markdown('<div class="page-title">Overview</div>', unsafe_allow_html=True)
-st.markdown('<div class="page-subtitle">A multi-agent AI security pipeline. Analyzes raw network logs, classifies threats, and generates containment playbooks in real time.</div>', unsafe_allow_html=True)
+BATCH_PATH = Path(settings.BATCH_RESULTS_PATH)
+BLOCKED_PATH = Path(settings.BLOCKED_IPS_PATH)
 
-c1, c2, c3 = st.columns(3)
+# ── Main Content ──
+st.markdown('<div class="page-title">General Overview</div>', unsafe_allow_html=True)
+st.markdown('<div class="page-subtitle">A high-level view of system activity and security performance. The agent automatically handles threat detection and response.</div>', unsafe_allow_html=True)
 
-with c1:
-    st.markdown("""
-    <div class="ui-card border-left-blue" style="height: 100%;">
-        <div class="ui-card-title">Live Analysis</div>
-        <div class="ui-card-value">Real-time</div>
-        <div class="ui-card-desc">Paste a raw log or pick a dataset event. Watch the pipeline execute inference and reasoning immediately.</div>
-    </div>
-    """, unsafe_allow_html=True)
+# ── Load Available Data ──
+batch_data = None
+if BATCH_PATH.exists():
+    try:
+        batch_data = json.loads(BATCH_PATH.read_text())
+    except Exception:
+        pass
 
-with c2:
-    st.markdown("""
-    <div class="ui-card border-left-green" style="height: 100%;">
-        <div class="ui-card-title">Dashboard</div>
-        <div class="ui-card-value">Batch</div>
-        <div class="ui-card-desc">Attack distributions, agent routing decisions, severity breakdown, and incident history on network data.</div>
-    </div>
-    """, unsafe_allow_html=True)
+blocked_count = 0
+if BLOCKED_PATH.exists():
+    try:
+        blocked = json.loads(BLOCKED_PATH.read_text())
+        blocked_count = len(blocked)
+    except Exception:
+        pass
 
-with c3:
-    st.markdown("""
-    <div class="ui-card border-left-amber" style="height: 100%;">
-        <div class="ui-card-title">Eval Results</div>
-        <div class="ui-card-value">Metrics</div>
-        <div class="ui-card-desc">Accuracy on CICIDS ground truth labels, and behavioral eval scenarios validating model judgment.</div>
-    </div>
-    """, unsafe_allow_html=True)
+total_events = batch_data.get("total", 0) if batch_data else 0
+accuracy = batch_data.get("accuracy_pct", 0) if batch_data else 0
+avg_lat = batch_data.get("avg_latency_s", 0) if batch_data else 0
 
-st.markdown('<div class="section-header">Agent vs Classifier</div>', unsafe_allow_html=True)
+# ── Main Cards ──
+m1, m2, m3 = st.columns(3)
+
+with m1:
+    st.markdown(f'''
+    <div class="ui-card border-left-blue">
+        <div class="ui-card-title">Real-time Analysis</div>
+        <div class="ui-card-value">{total_events}</div>
+        <div style="font-size:0.9rem; color:#64748b; margin-top:1rem;">Total security logs processed by the system.</div>
+    </div>''', unsafe_allow_html=True)
+
+with m2:
+    st.markdown(f'''
+    <div class="ui-card border-left-green">
+        <div class="ui-card-title">System Accuracy</div>
+        <div class="ui-card-value">{accuracy}%</div>
+        <div style="font-size:0.9rem; color:#64748b; margin-top:1rem;">Correct decisions vs. known security benchmarks.</div>
+    </div>''', unsafe_allow_html=True)
+
+with m3:
+    st.markdown(f'''
+    <div class="ui-card border-left-amber">
+        <div class="ui-card-title">Performance</div>
+        <div class="ui-card-value">{avg_lat}s</div>
+        <div style="font-size:0.9rem; color:#64748b; margin-top:1rem;">Average time to complete a security check.</div>
+    </div>''', unsafe_allow_html=True)
+
+
+# ── Comparison Section ──
+st.markdown('<div class="section-header">Traditional Method vs. AI Agent</div>', unsafe_allow_html=True)
 
 c4, c5 = st.columns(2)
 
 with c4:
     st.markdown("""
-    <div class="ui-card border-left-red">
-        <div class="ui-card-title">Predictive Classifier</div>
-        <div class="ui-card-desc" style="font-size: 0.95rem; line-height: 1.6; color: #334155;">
-            Takes an input sequence and returns a categorical label. Operations are deterministic. There is no branching logic, no confidence thresholds, and no subsequent agentic actions taken based on reasoning.
+    <div class="ui-card border-left-slate">
+        <div class="ui-card-title">Basic Classifier</div>
+        <div style="font-size:0.9rem; line-height:1.8; color:#334155;">
+            Follows a fixed set of rules to label data.<br>
+            Cannot search for new info or verify threats.<br>
+            Does not have memory of previous events.<br>
+            Only provides labels, not actions.
         </div>
     </div>
     """, unsafe_allow_html=True)
 
 with c5:
     st.markdown("""
-    <div class="ui-card border-left-green">
-        <div class="ui-card-title">AIR System</div>
-        <div class="ui-card-desc" style="font-size: 0.95rem; line-height: 1.6; color: #334155;">
-            A Triage Agent classifies the event and infers a confidence score. A Policy Router inspects this state and dynamically dictates execution flow. If thresholds are met, a distinct Response Agent formulates a playbook. Edge cases are routed back for Human Review.
+    <div class="ui-card border-left-blue">
+        <div class="ui-card-title">AI Security Agent</div>
+        <div style="font-size:0.9rem; line-height:1.8; color:#334155;">
+            <strong>Proactive Investigation:</strong> Looks up IPs and ports.<br>
+            <strong>Memory Context:</strong> Remembers similar past attacks.<br>
+            <strong>Decision Logic:</strong> Reasons through the steps to take.<br>
+            <strong>Immediate Action:</strong> Stops threats as they happen.
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+
+# ── Recent Activity (Muted Professional Style) ──
+if batch_data and batch_data.get("results"):
+    st.markdown('<div class="section-header">Registry activity</div>', unsafe_allow_html=True)
+
+    for r in batch_data["results"][-5:]:
+        rep = r.get("incident_report", {})
+        sev = rep.get("severity", "info")
+        attack = rep.get("attack_type", "?").replace("_", " ").title()
+        conf = rep.get("confidence_score", 0)
+        ip = rep.get("source_ip", "?")
+
+        sev_colors = {"critical": "#ef4444", "high": "#f97316", "medium": "#f59e0b", "low": "#10b981", "info": "#3b82f6"}
+        color = sev_colors.get(sev, "#64748b")
+
+        st.markdown(f'''
+        <div style="display:flex; align-items:center; gap:1.25rem; padding:1rem 0; border-bottom:1px solid #f1f5f9;">
+            <div style="width:10px; height:10px; border-radius:50%; background:{color}; flex-shrink:0;"></div>
+            <div style="flex:1; font-size:0.9rem; font-weight:700; color:#1e293b;">{attack}</div>
+            <div style="font-size:0.8rem; color:#64748b; font-family:'JetBrains Mono',monospace; background: #f8fafc; padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid #e2e8f0;">{ip}</div>
+            <div style="font-size:0.85rem; font-weight:800; color:{color};">{conf:.0%}</div>
+        </div>
+        ''', unsafe_allow_html=True)

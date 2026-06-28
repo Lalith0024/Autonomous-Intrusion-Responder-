@@ -12,8 +12,6 @@ Design Language:
 """
 
 import streamlit as st
-import json
-from pathlib import Path
 
 
 def inject_ui():
@@ -302,7 +300,6 @@ def inject_ui():
         try:
             import httpx
             import os
-            from src.core.config import settings
             api_base = os.getenv("API_BASE", "http://127.0.0.1:8000")
             r = httpx.get(f"{api_base}/health", timeout=1.0)
             health = r.json() if (r.status_code == 200) else {}

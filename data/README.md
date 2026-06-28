@@ -1,18 +1,39 @@
-# data/
+# 📊 AIR Data Ecosystem
 
-Real input data and analysis results. This folder is intentionally not committed to Git (except for `.gitkeep` placeholders).
+This directory manages the lifecycle of network log data, threat intelligence state, and analysis results.
 
-## cicids/
+---
 
-Place the network intrusion CSV here. The dataset is auto-downloaded via `kagglehub` when you run `src/data/batch_runner.py` — no manual download needed.
+## 📂 Directory Structure
 
-## results/
+### 🛡️ `blocked_ips.json`
+Acts as the **dynamic firewall state**. 
+- **Purpose**: Tracks IPs blocked by the `Response Agent`.
+- **Management**: Automatically updated by the `block_ip` tool. The Dashboard filters out expired entries based on `blocked_until`.
 
-Stores batch analysis output and eval results:
+### 🧪 `cicids/` (The Feed)
+- **Primary Source**: CICIDS-2017 Network Intrusion dataset.
+- **Automation**: Managed via `kagglehub`. If the CSV is missing, the system auto-downloads it on the first execution of `src/data/batch_runner.py`.
+- **Parser**: `src/data/cicids_parser.py` maps raw numeric flows to readable AI logs.
 
-| File | Created by | Read by |
-|------|-----------|---------|
-| `batch_results.json` | `src/data/batch_runner.py` | Incident Dashboard, Eval Results pages |
-| `eval_results.json` | `tests/test_evals.py` | Eval Results page |
+### 📈 `results/` (The Brain's Output)
+| File | Description |
+| :--- | :--- |
+| `batch_results.json` | JSON snapshot of analyzed events used to populate the **Incident Dashboard**. |
+| `eval_results.json` | Detailed metrics (F1 Score, Latency, Accuracy) for the AI model's performance. |
 
-Both files are generated on first run and cached — the dashboard reads from them without making additional LLM calls.
+### 🧠 `vector_index/` (The Memory)
+- **Engine**: FAISS (Facebook AI Similarity Search).
+- **Function**: Local vector store used for **Incident Memory**. It allows the agent to recall similar past attacks for better triage.
+
+---
+
+## 🔄 Data Pipeline Logic
+
+1.  **Ingest**: Raw CIDIDS records are sampled and converted to English.
+2.  **Enrich**: Tool results (GeoIP, abuse scores) are appended as temporary context.
+3.  **Persist**: Final `IncidentReport` objects are saved both to the `results/` JSON and the `vector_index/`.
+4.  **Visualize**: Streamlit reads from these files to provide a real-time SOC view.
+
+> [!IMPORTANT]
+> To reset the system memory, simply delete the contents of `data/vector_index/` and the `results/` JSON files. The system will rebuild them on next run.

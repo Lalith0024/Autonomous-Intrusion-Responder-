@@ -4,8 +4,6 @@ Downloads and parses the network intrusion dataset from Kaggle via kagglehub.
 Converts raw flow records into LogEvent-compatible dicts for the agent pipeline.
 """
 
-import os
-import random
 from pathlib import Path
 
 import pandas as pd
@@ -69,7 +67,14 @@ def get_ground_truth_label(row: pd.Series) -> str:
 
 
 def _load_dataframe() -> pd.DataFrame:
-    """Load the dataset via kagglehub (auto-downloads on first run)."""
+    """Load the dataset from the local path or via kagglehub as fallback."""
+    local_path = Path("data/cicids/network_logs.csv")
+    
+    if local_path.exists():
+        print(f"  Loading local dataset: {local_path}")
+        return pd.read_csv(local_path, encoding="utf-8", low_memory=False)
+
+    print("  Local dataset not found. Attempting to download via kagglehub...")
     try:
         import kagglehub
 

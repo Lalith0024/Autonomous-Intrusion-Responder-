@@ -27,10 +27,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from src.data.cicids_parser import load_cicids_sample
+from src.core.config import settings  # noqa: E402
+from src.data.cicids_parser import load_cicids_sample  # noqa: E402
 
 API_BASE = "http://127.0.0.1:8000"
-OUTPUT_PATH = Path("data/results/batch_results.json")
+OUTPUT_PATH = Path(settings.BATCH_RESULTS_PATH)
 SAMPLE_SIZE = 50
 
 

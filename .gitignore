@@ -64,3 +64,6 @@ venv.bak/
 data/results/*.json
 data/cicids/*.csv
 data/cicids/*.pcap
+data/cicids/*.zip
+data/blocked_ips.json
+data/vector_index/
