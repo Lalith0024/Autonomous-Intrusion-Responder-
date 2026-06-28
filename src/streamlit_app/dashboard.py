@@ -20,8 +20,10 @@ BATCH_PATH = Path(settings.BATCH_RESULTS_PATH)
 BLOCKED_PATH = Path(settings.BLOCKED_IPS_PATH)
 
 # ── Main Content ──
-st.markdown('<div class="page-title">General Overview</div>', unsafe_allow_html=True)
-st.markdown('<div class="page-subtitle">A high-level view of system activity and security performance. The agent automatically handles threat detection and response.</div>', unsafe_allow_html=True)
+st.markdown('''
+<div class="page-title">General Overview</div>
+<div class="page-subtitle">A high-level view of system activity and security performance. The AI agent automatically handles threat detection and active response, ensuring zero-trust enforcement in real time.</div>
+''', unsafe_allow_html=True)
 
 # ── Load Available Data ──
 batch_data = None
